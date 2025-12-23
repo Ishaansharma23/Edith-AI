@@ -39,8 +39,6 @@ const FormattedMessage = ({ content, type }) => {
   )
 }
 
-/* 
-   TYPING ANIMATION*/
 const TypingAnimation = () => (
   <div className="flex gap-1 px-4 py-3">
     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
@@ -283,7 +281,7 @@ const EdithAi = () => {
             disabled={!inputMessage.trim()}
             className="h-[50px] w-[50px] flex items-center justify-center
             rounded-xl bg-[#1a1a1a] border border-white/10
-            text-cyan-400 hover:bg-[#222] hover:text-cyan-300 disabled:opacity-40 transition"
+            text-cyan-400 hover:bg-[#222] hover:text-cyan-300 transition"
           >
             <FaPaperPlane className="text-sm" />
           </button>
