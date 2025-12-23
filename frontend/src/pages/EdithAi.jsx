@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import {
   FaPlus, FaUser, FaPaperPlane, FaRobot,
-  FaBars, FaCopy
+  FaBars, FaCopy, FaTrash
 } from 'react-icons/fa'
 import axios from 'axios'
 import { io } from "socket.io-client"
+import toast, { Toaster } from 'react-hot-toast'
 
 /* FORMATTED MESSAGE */
 const FormattedMessage = ({ content, type }) => {
@@ -178,8 +179,42 @@ const EdithAi = () => {
     )
   }
 
+  /* DELETE CHAT */
+  const deleteChat = async (chatId) => {
+    try {
+      await axios.delete(
+        `http://localhost:3000/api/chat/${chatId}`,
+        { withCredentials: true }
+      )
+
+      toast.success("Chat deleted")
+
+      setChats(prev => prev.filter(c => c._id !== chatId))
+
+      if (currentChatIdRef.current === chatId) {
+        currentChatIdRef.current = null
+        setCurrentChatId(null)
+        setMessages([])
+        setIsTyping(false)
+      }
+    } catch {
+      toast.error("Failed to delete chat")
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-black via-slate-950 to-blue-950 text-white overflow-hidden">
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#111',
+            color: '#fff',
+            border: '1px solid rgba(255,255,255,0.1)'
+          }
+        }}
+      />
 
       {/* SIDEBAR */}
       <div className={`${sidebarOpen ? 'w-70' : 'w-0'}
@@ -192,7 +227,7 @@ const EdithAi = () => {
             className="w-full flex items-center gap-3 px-4 py-3
             bg-gradient-to-r from-cyan-600 to-blue-400
             rounded-xl font-medium hover:opacity-90"
-            style={{ fontFamily: 'Inter', color: "black" }}
+            style={{ color: "black" }}
           >
             <FaPlus /> New Chat
           </button>
@@ -202,11 +237,25 @@ const EdithAi = () => {
           {chats.map(chat => (
             <div
               key={chat._id}
-              onClick={() => selectChat(chat._id)}
-              className={`p-3 rounded-lg cursor-pointer
+              className={`flex items-center justify-between gap-2 p-3 rounded-lg
               ${currentChatId === chat._id ? 'bg-cyan-500/20' : 'hover:bg-white/5'}`}
             >
-              <p className="text-sm truncate">{chat.title}</p>
+              <p
+                onClick={() => selectChat(chat._id)}
+                className="text-sm truncate flex-1 cursor-pointer"
+              >
+                {chat.title}
+              </p>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  deleteChat(chat._id)
+                }}
+                className="p-2 rounded-md hover:bg-red-500/20 text-red-400"
+              >
+                <FaTrash className="text-xs" />
+              </button>
             </div>
           ))}
         </div>
@@ -227,8 +276,7 @@ const EdithAi = () => {
               <FaBars />
             </button>
 
-            <h1 className="text-xl font-extrabold tracking-wide"
-              style={{ fontFamily: 'Space Grotesk' }}>
+            <h1 className="text-xl font-extrabold tracking-wide">
               EDITH
             </h1>
 
