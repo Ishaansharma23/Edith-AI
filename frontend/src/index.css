@@ -1,5 +1,23 @@
 @import "tailwindcss";
 
+
+.input-style {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 0.75rem;
+    color: white;
+    outline: none;
+  }
+  .input-style::placeholder {
+    color: #6b7280;
+  }
+  .input-style:focus {
+    border-color: #22d3ee;
+    box-shadow: 0 0 0 1px rgba(34,211,238,0.4);
+  }
+
 @font-face {
     font-family: 'Agrandir';
     src: url('/Agrandir-GrandHeavy.otf') format('opentype');
