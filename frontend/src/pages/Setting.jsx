@@ -55,7 +55,7 @@ const Settings = () => {
       >
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight">Account Settings</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">Account Settings</h2>
           <p className="text-gray-400 text-sm mt-1">
             Update your personal information
           </p>

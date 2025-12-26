@@ -1,68 +1,83 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { FaArrowRight } from 'react-icons/fa6'
+import { FaArrowRight } from 'react-icons/fa'
 
 const HeroPage = () => {
   const navigate = useNavigate()
+  const [text, setText] = useState("")
+  const fullText = "Hello, I’m Edith. How can I help you today?"
 
-  const handleGetStarted = () => {
-    navigate('/Register')
-  }
+  // animation
+  useEffect(() => {
+    let i = 0
+    const interval = setInterval(() => {
+      setText(fullText.slice(0, i))
+      i++
+      if (i > fullText.length) clearInterval(interval)
+    }, 60)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <>
-      <div className="w-full h-screen relative bg-gradient-to-br from-black via-black to-blue-900 flex items-center justify-center overflow-hidden">
-        
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-blue-900/30 to-transparent"></div>
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-blue-950
+      flex items-center justify-center px-6">
 
-        <div className="text-center px-6 max-w-8xl mx-auto relative z-10">
-          
-          {/* Main Headline */}
-          <h1
-            className="text-6xl md:text-8xl font-extrabold text-white mb-6 tracking-tight leading-none"
-            style={{ fontFamily: 'Space Grotesk, sans-serif' }}
-          >
-            Meet{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-500 to-blue-600 drop-shadow-[0_0_25px_rgba(56,189,248,0.6)]">
-              Edith
-            </span>
-          </h1>
+      <div className="w-full max-w-6xl grid md:grid-cols-2 gap-16 items-center">
 
-          {/* Subtitle */}
-          <p
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed"
-            style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400 }}
-          >
-            Your intelligent AI companion that understands, learns, and evolves
-            with every conversation. Experience the future of AI interaction.
-          </p>
+        {/* Left side */}
+        <div className="bg-black/40 backdrop-blur-xl border border-white/10
+          rounded-3xl p-8 shadow-2xl">
 
-          {/* Animated Get Started Button */}
-          <div className="flex justify-center">
-            <button
-              className="animated-button w-50"
-              onClick={handleGetStarted}
-            >
-              <div className="circle"></div>
-              <FaArrowRight className="arr-2" />
-              <span
-                className="text text-lg tracking-wider"
-                style={{ fontFamily: 'Inter, sans-serif', fontWeight: 300 }}
-              >
-                Get Started
-              </span>
-              <FaArrowRight className="arr-1" />
-            </button>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+            <span className="text-sm text-green-400">Edith AI • Online</span>
+          </div>
+
+          <div className="bg-slate-900/60 border border-cyan-500/20
+            rounded-2xl p-5 text-gray-100 text-lg leading-relaxed min-h-[120px]">
+            {text}
+            <span className="animate-pulse">▍</span>
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce"></div>
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-100"></div>
+            <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-200"></div>
           </div>
         </div>
 
-        {/* Decorative elements (blue theme) */}
-        <div className="absolute top-20 left-20 w-2 h-2 bg-sky-400 rounded-full opacity-60 animate-pulse"></div>
-        <div className="absolute bottom-32 right-32 w-3 h-3 bg-blue-500 rounded-full opacity-40 animate-pulse delay-1000"></div>
-        <div className="absolute top-1/3 right-20 w-1 h-1 bg-cyan-300 rounded-full opacity-80 animate-pulse delay-500"></div>
+        {/* RIGHT – TEXT */}
+        <div className="space-y-6">
+
+          <h1 className="text-4xl md:text-5xl font-extrabold text-white leading-tight">
+            A smarter way to <br />
+            <span className="text-transparent bg-clip-text
+              bg-gradient-to-r from-cyan-400 to-blue-500">
+              talk with AI
+            </span>
+          </h1>
+
+          <p className="text-gray-300 max-w-md leading-relaxed">
+            Edith is your intelligent AI assistant designed for natural,
+            real-time conversations. Ask questions, solve problems, and explore ideas.
+          </p>
+
+          <button
+            onClick={() => navigate('/register')}
+            className="group inline-flex items-center gap-2 px-6 py-3 rounded-xl
+  bg-gradient-to-r from-cyan-500 to-blue-600
+  text-white font-medium
+  transition-all duration-300
+  hover:shadow-[0_0_25px_rgba(38,210,220,1)]
+  hover:scale-[1.04]"
+          >
+            Get Started
+            <FaArrowRight className="text-sm  transition-transform duration-300 group-hover:translate-x-1" />
+          </button>
+
+        </div>
       </div>
-    </>
+    </div>
   )
 }
 

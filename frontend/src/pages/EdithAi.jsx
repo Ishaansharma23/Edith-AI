@@ -353,7 +353,7 @@ const EdithAi = () => {
               )}
               <div className={`max-w-3xl p-4 rounded-2xl shadow-lg
                 ${msg.type === 'user'
-                  ? 'bg-gradient-to-r from-cyan-500 to-blue-600'
+                  ? 'bg-black'
                   : 'bg-slate-900/70 border border-cyan-500/20 backdrop-blur'}`}>
                 <FormattedMessage content={msg.content} type={msg.type} />
               </div>
