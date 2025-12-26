@@ -4,6 +4,7 @@ import HeroPage from '../pages/HeroPage'
 import Login from '../pages/Login'
 import Register from '../pages/Register'
 import EdithAi from '../pages/EdithAi'
+import Setting from '../pages/Setting' 
 
 const MainRoutes = () => {
   return (
@@ -12,6 +13,7 @@ const MainRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/edith" element={<EdithAi />} />
+      <Route path="/setting" element={<Setting />} />
     </Routes>
   )
 }

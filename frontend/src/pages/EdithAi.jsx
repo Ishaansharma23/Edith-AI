@@ -8,6 +8,7 @@ import { io } from "socket.io-client"
 import toast, { Toaster } from 'react-hot-toast'
 import { FaSignOutAlt } from 'react-icons/fa'
 import { FaCog } from 'react-icons/fa'
+import { useNavigate } from 'react-router-dom'
 
 
 
@@ -24,6 +25,7 @@ const FormattedMessage = ({ content, type }) => {
   if (type === 'user') {
     return <div className="whitespace-pre-wrap">{content}</div>
   }
+
 
   return (
     <div className="relative group font-[Inter]">
@@ -81,6 +83,8 @@ const EdithAi = () => {
       .then(res => setUser(res.data.user))
       .catch(() => { })
   }, [])
+
+  const navigate = useNavigate(); // navigate krne k lye
 
   /* LOGOUT */
   const handleLogout = () => {
@@ -311,6 +315,9 @@ const EdithAi = () => {
                   <button
                     className="w-full px-4 py-2 text-left hover:bg-white/5
              flex items-center gap-2"
+             onClick={()=>{
+              navigate("/setting")
+             }}
                   >
                     <FaCog className="text-sm" />
                     <span>Settings</span>
