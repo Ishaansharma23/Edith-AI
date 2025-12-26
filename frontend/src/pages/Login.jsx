@@ -24,7 +24,7 @@ const Login = () => {
       .then(() => {
         toast.dismiss(loadingToast)
         toast.success('Login successful 🚀')
-        navigate('/AnolaAi')
+        navigate('/edith')
       })
       .catch((err) => {
         toast.dismiss(loadingToast)

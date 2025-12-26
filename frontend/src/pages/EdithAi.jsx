@@ -6,6 +6,10 @@ import {
 import axios from 'axios'
 import { io } from "socket.io-client"
 import toast, { Toaster } from 'react-hot-toast'
+import { FaSignOutAlt } from 'react-icons/fa'
+import { FaCog } from 'react-icons/fa'
+
+
 
 /* FORMATTED MESSAGE */
 const FormattedMessage = ({ content, type }) => {
@@ -75,7 +79,7 @@ const EdithAi = () => {
       withCredentials: true
     })
       .then(res => setUser(res.data.user))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   /* LOGOUT */
@@ -83,7 +87,7 @@ const EdithAi = () => {
     axios.post("http://localhost:3000/api/auth/logout", {}, {
       withCredentials: true
     }).then(() => {
-      window.location.href = "/Login"
+      window.location.href = "/login"
     })
   }
 
@@ -93,7 +97,7 @@ const EdithAi = () => {
       withCredentials: true
     })
       .then(res => setChats(res.data.chats))
-      .catch(() => {})
+      .catch(() => { })
   }, [])
 
   /* SOCKET */
@@ -288,6 +292,7 @@ const EdithAi = () => {
             </span>
           </div>
 
+
           {user && (
             <div className="relative">
               <button
@@ -303,15 +308,24 @@ const EdithAi = () => {
               {profileOpen && (
                 <div className="absolute right-0 mt-2 w-40
                   bg-[#111] border border-white/10 rounded-xl shadow-lg z-50">
-                  <button className="w-full px-4 py-2 text-left hover:bg-white/5">
-                    ⚙️ Settings
+                  <button
+                    className="w-full px-4 py-2 text-left hover:bg-white/5
+             flex items-center gap-2"
+                  >
+                    <FaCog className="text-sm" />
+                    <span>Settings</span>
                   </button>
+
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-white/5"
+                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-white/5
+             flex items-center gap-2 rounded-lg"
                   >
-                    🚪 Logout
+                    <FaSignOutAlt className="text-sm" />
+                    <span>Logout</span>
                   </button>
+
+
                 </div>
               )}
             </div>
