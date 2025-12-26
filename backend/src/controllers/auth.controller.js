@@ -96,6 +96,40 @@ async function getMe(req, res) {
   })
 }
 
+// profile update krna ka controller 
+async function updateProfile(req, res) {
+  try {
+    const { firstName, lastName, email, password } = req.body
+
+    const user = await userModel.findById(req.user._id)
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    if (firstName) user.fullName.firstName = firstName
+    if (lastName) user.fullName.lastName = lastName
+    if (email) user.email = email
+
+    if (password && password.trim() !== "") {
+      user.password = await bcrypt.hash(password, 10)
+    }
+
+    await user.save()
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        email: user.email,
+        fullName: user.fullName
+      }
+    })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ message: "Server error" })
+  }
+}
+
 /* LOGOUT */
 function logoutUser(req, res) {
   res.clearCookie("token", {
@@ -111,5 +145,6 @@ module.exports = {
   registerUser,
   loginUser,
   getMe,
+  updateProfile, // ise export b krdia taki route m use kr sku
   logoutUser
 }
