@@ -1,6 +1,8 @@
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/user.model")
 
+// ye user ko authorize kr rha ha ki user logged in tha ya nahi 
+
 async function authUser(req, res, next) {
   try {
     const token = req.cookies.token

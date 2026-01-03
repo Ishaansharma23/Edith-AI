@@ -14,7 +14,7 @@ function initSocketServer(httpServer) {
         }
     })
 
-    //socketio middleware
+    //socket io middleware
     io.use(async (socket, next) => {
         const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
         // console.log("socket connection cookies:", cookies);

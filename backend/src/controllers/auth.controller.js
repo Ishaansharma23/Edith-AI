@@ -2,7 +2,7 @@ const userModel = require("../models/user.model")
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 
-/* REGISTER */
+// Register
 async function registerUser(req, res) {
   try {
     const { fullName: { firstName, lastName }, email, password } = req.body
@@ -47,7 +47,7 @@ async function registerUser(req, res) {
   }
 }
 
-/* LOGIN */
+// login wala controller
 async function loginUser(req, res) {
   try {
     const { email, password } = req.body
@@ -89,10 +89,10 @@ async function loginUser(req, res) {
   }
 }
 
-/* GET LOGGED IN USER */
+// GET LOGGED IN USER - jo frontend pr jara data 
 async function getMe(req, res) {
   return res.status(200).json({
-    user: req.user
+    user: req.user // user ka naam bhejre bs abhi 
   })
 }
 
@@ -130,7 +130,7 @@ async function updateProfile(req, res) {
   }
 }
 
-/* LOGOUT */
+// logout
 function logoutUser(req, res) {
   res.clearCookie("token", {
     httpOnly: true,
