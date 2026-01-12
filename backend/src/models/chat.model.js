@@ -1,9 +1,9 @@
 const mongoose = require("mongoose");
 
 const chatSchema = new mongoose.Schema({
-    user:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'chatgptusers',
+    user:{ // konse user ki ye chat h
+        type: mongoose.Schema.Types.ObjectId, // jo id humne store kri ,
+        ref:'chatgptusers', // jo id hai wo chatgptuser collection s belong krti h 
         required: true
     },
     title:{

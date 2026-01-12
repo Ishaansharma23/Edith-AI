@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
         type:String,
     }
 }, {
-    timestamps:true
+    timestamps:true // user ka data kab update hua tha db m ya create kab hota hai ye db m mention hojati h
 }
 )
 

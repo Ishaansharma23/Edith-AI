@@ -14,14 +14,17 @@ function initSocketServer(httpServer) {
         }
     })
 
-    //socket io middleware
+    //socket io MIDDLEWARE to only make connection with socket when user is valid and logged in
     io.use(async (socket, next) => {
-        const cookies = cookie.parse(socket.handshake.headers?.cookie || "");
+      // isme kya hai ki hum cookie ko hi bhejre hai or use aise accept krte hai 
+
+        const cookies = cookie.parse(socket.handshake.headers?.cookie || ""); // HTTP me cookies hamesha headers ke andar jaati hain.
         // console.log("socket connection cookies:", cookies);
         if (!cookies.token) {
             next(new Error("Authentication Error: No token provided"))
         }
         try {
+              // TOKEN hi batata hai ki USER logged in hai y nahi 
             const decode = jwt.verify(cookies.token, process.env.JWT_SECRET);
 
             const user = await userModel.findById(decode.id)
@@ -51,6 +54,7 @@ function initSocketServer(httpServer) {
                         role: "user"
                     }),
                     generateVector(messagePayload.content)
+                    
                 ])
 
                 await createMemory({
@@ -110,9 +114,9 @@ function initSocketServer(httpServer) {
                     finalPrompt.unshift({ role: 'user', parts: [{ text: systemInstruction }] });
                 }
 
-                const anolaPersona = `You are Anola, a friendly and highly intelligent AI assistant 🤖. Your goal is to provide clear, accurate, and helpful responses. Be polite, professional, and use emojis where appropriate to make the conversation feel more engaging and natural 👍. You are to follow all user instructions precisely.`
+                const EdithPersona = `You are Edith, a friendly and highly intelligent AI assistant 🤖. Your goal is to provide clear, accurate, and helpful responses. Be polite, professional, and use emojis where appropriate to make the conversation feel more engaging and natural 👍. You are to follow all user instructions precisely.`
 
-                const response = await generateResponse(finalPrompt, anolaPersona)
+                const response = await generateResponse(finalPrompt, EdithPersona)
 
                 socket.emit('ai-response', {
                     content: response,

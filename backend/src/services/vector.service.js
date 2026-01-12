@@ -22,7 +22,7 @@ async function queryMemory({queryVector, limit=5, metadata} ){
 
     const data = await chatGptIndex.query({
         vector: queryVector,
-        topK: limit,
+        topK: limit, //mtlb top 3-4 ya jo b close related lagre vector wo dedo like k messages bhejo jo bht close hai msg k
         filter: metadata ? metadata : undefined,
         includeMetadata:true
     })

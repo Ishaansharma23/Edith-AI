@@ -11,7 +11,7 @@ const app = express();
 
 // using middlewares 
 app.use(express.json());
-app.use(cookieParser());
+app.use(cookieParser()); // Browser se aane wali cookies ko read karke req.cookies me daal deta hai
 app.use(cors({
     origin: 'http://localhost:5173',
     credentials: true

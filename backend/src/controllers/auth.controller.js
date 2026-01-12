@@ -7,29 +7,33 @@ async function registerUser(req, res) {
   try {
     const { fullName: { firstName, lastName }, email, password } = req.body
 
+    // finding ki email already exist krti hai ya nahi
     const isUserAlreadyExists = await userModel.findOne({ email })
     if (isUserAlreadyExists) {
       return res.status(400).json({ message: "User already exists" })
     }
 
+    // password hash kr rhe 10 ki salt hai 
     const hashPassword = await bcrypt.hash(password, 10)
 
+    // ye hum user create kr rhe , MongoDB me insert kar deta hai
     const user = await userModel.create({
       fullName: { firstName, lastName },
       email,
       password: hashPassword
     })
 
+    // token dere , mtlb login bar bar na krna pde, “Main proof hoon ki user logged-in hai”
     const token = jwt.sign(
       { id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     )
-
+    //Cookie = browser me store hone wala chhota data , jwt is stored in cookie &localstorage
     res.cookie("token", token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: false // true when HTTPS
+      httpOnly: true, // JavaScript se cookie access nahi ho sakti
+      sameSite: "lax", // Dusri website se fake request me cookie nahi jaayegi
+      secure: false // true when HTTPS, HTTP pe bhi cookie kaam karegi
     })
 
     return res.status(201).json({
