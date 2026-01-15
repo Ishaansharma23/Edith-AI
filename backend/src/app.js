@@ -13,7 +13,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser()); // Browser se aane wali cookies ko read karke req.cookies me daal deta hai
 app.use(cors({
-    origin: ['http://localhost:5173', "https://edith-ai-1.onrender.com"],
+    origin: 'http://localhost:5173',
     credentials: true
 }))
 
