@@ -32,8 +32,9 @@ async function registerUser(req, res) {
     //Cookie = browser me store hone wala chhota data , jwt is stored in cookie &localstorage
     res.cookie("token", token, {
       httpOnly: true, // JavaScript se cookie access nahi ho sakti
-      sameSite: "lax", // Dusri website se fake request me cookie nahi jaayegi
-      secure: false // true when HTTPS, HTTP pe bhi cookie kaam karegi
+      sameSite: "None", // Dusri website se fake request me cookie nahi jaayegi
+      secure: true, // true when HTTPS, HTTP pe bhi cookie kaam karegi
+      maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
     return res.status(201).json({
@@ -74,8 +75,9 @@ async function loginUser(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      sameSite: "lax",
-      secure: false
+      sameSite: "None",
+      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
     return res.status(200).json({
@@ -138,8 +140,8 @@ async function updateProfile(req, res) {
 function logoutUser(req, res) {
   res.clearCookie("token", {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false
+    sameSite: "None",
+    secure: true
   })
 
   res.status(200).json({ message: "Logged out successfully" })

@@ -1,34 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from "react";
 import {
-  FaPlus, FaUser, FaPaperPlane, FaRobot,
-  FaBars, FaCopy, FaTrash
-} from 'react-icons/fa'
-import axios from 'axios'
-import { io } from "socket.io-client"
-import toast, { Toaster } from 'react-hot-toast'
-import { FaSignOutAlt } from 'react-icons/fa'
-import { FaCog } from 'react-icons/fa'
-import { useNavigate } from 'react-router-dom'
+  FaPlus,
+  FaUser,
+  FaPaperPlane,
+  FaRobot,
+  FaBars,
+  FaCopy,
+  FaTrash,
+  FaSignOutAlt,
+  FaCog,
+} from "react-icons/fa";
+import axios from "axios";
+import { io } from "socket.io-client";
+import toast, { Toaster } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
+const API_URL = import.meta.env.VITE_API_URL;
 
-
-/* FORMATTED MESSAGE */
+/*FORMATTED MESSAGE */
 const FormattedMessage = ({ content, type }) => {
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(content)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    navigator.clipboard.writeText(content);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-  if (type === 'user') {
-    return <div className="whitespace-pre-wrap">{content}</div>
+  if (type === "user") {
+    return <div className="whitespace-pre-wrap">{content}</div>;
   }
-
 
   return (
-    <div className="relative group font-[Inter]">
+    <div className="relative group">
       <pre className="whitespace-pre-wrap text-gray-100 leading-relaxed">
         {content}
       </pre>
@@ -40,8 +44,9 @@ const FormattedMessage = ({ content, type }) => {
         {copied ? "✓" : <FaCopy className="text-xs" />}
       </button>
     </div>
-  )
-}
+  );
+};
+
 
 const TypingAnimation = () => (
   <div className="flex gap-1 px-4 py-3">
@@ -49,204 +54,196 @@ const TypingAnimation = () => (
     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-100"></div>
     <div className="w-2 h-2 bg-cyan-400 rounded-full animate-bounce delay-200"></div>
   </div>
-)
+);
 
-/* MAIN COMPONENT */
+
 const EdithAi = () => {
-  const [messages, setMessages] = useState([])
-  const [inputMessage, setInputMessage] = useState('')
-  const [socket, setSocket] = useState(null)
-  const [socketConnected, setSocketConnected] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768)
-  const [isTyping, setIsTyping] = useState(false)
+  const navigate = useNavigate();
 
-  const [user, setUser] = useState(null)
-  const [profileOpen, setProfileOpen] = useState(false)
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [socketConnected, setSocketConnected] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth > 768);
+  const [isTyping, setIsTyping] = useState(false);
 
-  const [chats, setChats] = useState([])
-  const [currentChatId, setCurrentChatId] = useState(null)
-  const currentChatIdRef = useRef(null)
+  const [user, setUser] = useState(null);
+  const [profileOpen, setProfileOpen] = useState(false);
 
-  const messagesEndRef = useRef(null)
+  const [chats, setChats] = useState([]);
+  const [currentChatId, setCurrentChatId] = useState(null);
+  const currentChatIdRef = useRef(null);
+
+  const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
-  useEffect(scrollToBottom, [messages, isTyping])
+  useEffect(scrollToBottom, [messages, isTyping]);
 
-  /* FETCH USER */
+
   useEffect(() => {
-    axios.get("http://localhost:3000/api/auth/me", {
-      withCredentials: true
-    })
-      .then(res => setUser(res.data.user))
-      .catch(() => { })
-  }, [])
+    axios
+      .get(`${API_URL}/api/auth/me`, { withCredentials: true })
+      .then((res) => setUser(res.data.user))
+      .catch(() => {});
+  }, []);
 
-  const navigate = useNavigate(); // navigate krne k lye
+ 
+  const handleLogout = async () => {
+    await axios.post(
+      `${API_URL}/api/auth/logout`,
+      {},
+      { withCredentials: true }
+    );
+    window.location.href = "/login";
+  };
 
-  /* LOGOUT */
-  const handleLogout = () => {
-    axios.post("http://localhost:3000/api/auth/logout", {}, {
-      withCredentials: true
-    }).then(() => {
-      window.location.href = "/login"
-    })
-  }
-
-  /* FETCH CHATS */
+  /* ---------- FETCH CHATS ---------- */
   useEffect(() => {
-    axios.get("http://localhost:3000/api/chat", {
-      withCredentials: true
-    })
-      .then(res => setChats(res.data.chats))
-      .catch(() => { })
-  }, [])
+    axios
+      .get(`${API_URL}/api/chat`, { withCredentials: true })
+      .then((res) => setChats(res.data.chats))
+      .catch(() => {});
+  }, []);
 
-  /* SOCKET */
+  /* ---------- SOCKET ---------- */
   useEffect(() => {
-    const s = io("http://localhost:3000", { withCredentials: true })
+    const s = io(API_URL, { withCredentials: true });
 
-    s.on("connect", () => setSocketConnected(true))
-    s.on("disconnect", () => setSocketConnected(false))
+    s.on("connect", () => setSocketConnected(true));
+    s.on("disconnect", () => setSocketConnected(false));
 
     s.on("ai-response", (res) => {
-      if (res.chat !== currentChatIdRef.current) return
-      setIsTyping(false)
-      setMessages(prev => [...prev, {
-        id: Date.now(),
-        type: 'ai',
-        content: res.content,
-        timestamp: new Date()
-      }])
-    })
+      if (res.chat !== currentChatIdRef.current) return;
 
-    setSocket(s)
-    return () => s.disconnect()
-  }, [])
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          type: "ai",
+          content: res.content,
+        },
+      ]);
+    });
 
-  /* SEND MESSAGE */
+    setSocket(s);
+    return () => s.disconnect();
+  }, []);
+
+  /* ---------- SEND MESSAGE ---------- */
   const handleSendMessage = (e) => {
-    e.preventDefault()
-    if (!inputMessage.trim() || !socket || !currentChatIdRef.current) return
+    e.preventDefault();
+    if (!inputMessage.trim() || !socket || !currentChatIdRef.current) return;
 
-    const text = inputMessage.trim()
+    const text = inputMessage.trim();
 
-    setMessages(prev => [...prev, {
-      id: Date.now(),
-      type: 'user',
-      content: text,
-      timestamp: new Date()
-    }])
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), type: "user", content: text },
+    ]);
 
     socket.emit("ai-message", {
       chat: currentChatIdRef.current,
-      content: text
-    })
+      content: text,
+    });
 
-    setInputMessage('')
-    setIsTyping(true)
-  }
+    setInputMessage("");
+    setIsTyping(true);
+  };
 
-  /* NEW CHAT */
+  /* ---------- NEW CHAT ---------- */
   const handleNewChat = async () => {
     const res = await axios.post(
-      "http://localhost:3000/api/chat",
+      `${API_URL}/api/chat`,
       { title: "New Chat" },
       { withCredentials: true }
-    )
+    );
 
-    setChats(prev => [res.data.chat, ...prev])
-    setMessages([])
-    setIsTyping(false)
+    setChats((prev) => [res.data.chat, ...prev]);
+    setMessages([]);
+    setIsTyping(false);
 
-    currentChatIdRef.current = res.data.chat._id
-    setCurrentChatId(res.data.chat._id)
-  }
+    currentChatIdRef.current = res.data.chat._id;
+    setCurrentChatId(res.data.chat._id);
+  };
 
-  /* SELECT CHAT */
+  /* ---------- SELECT CHAT ---------- */
   const selectChat = async (chatId) => {
-    currentChatIdRef.current = chatId
-    setCurrentChatId(chatId)
-    setMessages([])
-    setIsTyping(false)
+    currentChatIdRef.current = chatId;
+    setCurrentChatId(chatId);
+    setMessages([]);
+    setIsTyping(false);
 
     const res = await axios.get(
-      `http://localhost:3000/api/chat/messages/${chatId}`,
+      `${API_URL}/api/chat/messages/${chatId}`,
       { withCredentials: true }
-    )
+    );
 
     setMessages(
-      res.data.messages.map(m => ({
+      res.data.messages.map((m) => ({
         id: m._id,
-        type: m.role === 'user' ? 'user' : 'ai',
+        type: m.role === "user" ? "user" : "ai",
         content: m.content,
-        timestamp: new Date(m.createdAt)
       }))
-    )
-  }
+    );
+  };
 
-  /* DELETE CHAT */
+  /* ---------- DELETE CHAT ---------- */
   const deleteChat = async (chatId) => {
     try {
-      await axios.delete(
-        `http://localhost:3000/api/chat/${chatId}`,
-        { withCredentials: true }
-      )
+      await axios.delete(`${API_URL}/api/chat/${chatId}`, {
+        withCredentials: true,
+      });
 
-      toast.success("Chat deleted")
-
-      setChats(prev => prev.filter(c => c._id !== chatId))
+      toast.success("Chat deleted");
+      setChats((prev) => prev.filter((c) => c._id !== chatId));
 
       if (currentChatIdRef.current === chatId) {
-        currentChatIdRef.current = null
-        setCurrentChatId(null)
-        setMessages([])
-        setIsTyping(false)
+        currentChatIdRef.current = null;
+        setCurrentChatId(null);
+        setMessages([]);
+        setIsTyping(false);
       }
     } catch {
-      toast.error("Failed to delete chat")
+      toast.error("Failed to delete chat");
     }
-  }
+  };
 
+  /* ---------- UI ---------- */
   return (
     <div className="flex h-screen bg-gradient-to-br from-black via-slate-950 to-blue-950 text-white overflow-hidden">
-
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          style: {
-            background: '#111',
-            color: '#fff',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }
-        }}
-      />
+      <Toaster position="top-right" />
 
       {/* SIDEBAR */}
-      <div className={`${sidebarOpen ? 'w-70' : 'w-0'}
+      <div
+        className={`${sidebarOpen ? "w-72" : "w-0"}
         bg-black/40 backdrop-blur-xl border-r border-cyan-500/20
-        transition-all duration-300 overflow-hidden`}>
-
+        transition-all duration-300 overflow-hidden`}
+      >
         <div className="p-4 border-b border-cyan-500/20">
           <button
             onClick={handleNewChat}
             className="w-full flex items-center gap-3 px-4 py-3
             bg-gradient-to-r from-cyan-600 to-blue-400
-            rounded-xl font-medium hover:opacity-90"
-            style={{ color: "black" }}
+            rounded-xl font-medium text-black"
           >
             <FaPlus /> New Chat
           </button>
         </div>
 
         <div className="p-3 space-y-2">
-          {chats.map(chat => (
+          {chats.map((chat) => (
             <div
               key={chat._id}
               className={`flex items-center justify-between gap-2 p-3 rounded-lg
-              ${currentChatId === chat._id ? 'bg-cyan-500/20' : 'hover:bg-white/5'}`}
+              ${
+                currentChatId === chat._id
+                  ? "bg-cyan-500/20"
+                  : "hover:bg-white/5"
+              }`}
             >
               <p
                 onClick={() => selectChat(chat._id)}
@@ -257,8 +254,8 @@ const EdithAi = () => {
 
               <button
                 onClick={(e) => {
-                  e.stopPropagation()
-                  deleteChat(chat._id)
+                  e.stopPropagation();
+                  deleteChat(chat._id);
                 }}
                 className="p-2 rounded-md hover:bg-red-500/20 text-red-400"
               >
@@ -271,7 +268,6 @@ const EdithAi = () => {
 
       {/* MAIN */}
       <div className="flex-1 flex flex-col">
-
         {/* HEADER */}
         <div className="flex items-center justify-between px-4 py-4
           border-b border-cyan-500/20 bg-black/40 backdrop-blur">
@@ -284,18 +280,18 @@ const EdithAi = () => {
               <FaBars />
             </button>
 
-            <h1 className="text-xl font-extrabold tracking-wide">
-              EDITH
-            </h1>
+            <h1 className="text-xl font-extrabold">EDITH</h1>
 
-            <span className={`text-xs px-2 py-1 rounded-full
-              ${socketConnected
-                ? 'bg-green-500/20 text-green-400'
-                : 'bg-red-500/20 text-red-400'}`}>
-              ● {socketConnected ? 'Connected' : 'Disconnected'}
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${
+                socketConnected
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-red-500/20 text-red-400"
+              }`}
+            >
+              ● {socketConnected ? "Connected" : "Disconnected"}
             </span>
           </div>
-
 
           {user && (
             <div className="relative">
@@ -303,36 +299,28 @@ const EdithAi = () => {
                 onClick={() => setProfileOpen(!profileOpen)}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10"
               >
-                <div className="w-8 h-8 rounded-full bg-[#222] flex items-center justify-center">
-                  <FaUser className="text-sm text-gray-300" />
-                </div>
-                <span className="text-sm">{user.fullName?.firstName}</span>
+                <FaUser />
+                <span className="text-sm">
+                  {user.fullName?.firstName || "User"}
+                </span>
               </button>
 
               {profileOpen && (
-                <div className="absolute right-0 mt-2 w-40
-                  bg-[#111] border border-white/10 rounded-xl shadow-lg z-50">
+                <div className="absolute right-0 mt-2 w-40 bg-[#111]
+                  border border-white/10 rounded-xl z-50">
                   <button
-                    className="w-full px-4 py-2 text-left hover:bg-white/5
-             flex items-center gap-2"
-             onClick={()=>{
-              navigate("/setting")
-             }}
+                    onClick={() => navigate("/setting")}
+                    className="w-full px-4 py-2 text-left hover:bg-white/5 flex gap-2"
                   >
-                    <FaCog className="text-sm" />
-                    <span>Settings</span>
+                    <FaCog /> Settings
                   </button>
 
                   <button
                     onClick={handleLogout}
-                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-white/5
-             flex items-center gap-2 rounded-lg"
+                    className="w-full px-4 py-2 text-left text-red-400 hover:bg-white/5 flex gap-2"
                   >
-                    <FaSignOutAlt className="text-sm" />
-                    <span>Logout</span>
+                    <FaSignOutAlt /> Logout
                   </button>
-
-
                 </div>
               )}
             </div>
@@ -341,36 +329,33 @@ const EdithAi = () => {
 
         {/* CHAT */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {messages.map(msg => (
-            <div key={msg.id}
-              className={`flex gap-3 ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-              {msg.type === 'ai' && (
-                <div className="w-9 h-9 rounded-full
-                  bg-gradient-to-br from-cyan-400 to-blue-600
-                  flex items-center justify-center shadow-lg">
+          {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex gap-3 ${
+                msg.type === "user" ? "justify-end" : "justify-start"
+              }`}
+            >
+              {msg.type === "ai" && (
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br
+                  from-cyan-400 to-blue-600 flex items-center justify-center">
                   <FaRobot />
                 </div>
               )}
-              <div className={`max-w-3xl p-4 rounded-2xl shadow-lg
-                ${msg.type === 'user'
-                  ? 'bg-black'
-                  : 'bg-slate-900/70 border border-cyan-500/20 backdrop-blur'}`}>
+
+              <div
+                className={`max-w-3xl p-4 rounded-2xl ${
+                  msg.type === "user"
+                    ? "bg-black"
+                    : "bg-slate-900/70 border border-cyan-500/20"
+                }`}
+              >
                 <FormattedMessage content={msg.content} type={msg.type} />
               </div>
             </div>
           ))}
 
-          {isTyping && (
-            <div className="flex gap-3">
-              <div className="w-8 h-8 bg-cyan-500 rounded-full flex items-center justify-center">
-                <FaRobot />
-              </div>
-              <div className="bg-slate-900/60 border border-cyan-500/20 rounded-2xl">
-                <TypingAnimation />
-              </div>
-            </div>
-          )}
-
+          {isTyping && <TypingAnimation />}
           <div ref={messagesEndRef} />
         </div>
 
@@ -378,30 +363,28 @@ const EdithAi = () => {
         {currentChatId && (
           <form
             onSubmit={handleSendMessage}
-            className="p-5 border-t border-white/10 bg-black/40 flex gap-3 items-end"
+            className="p-5 border-t border-white/10 bg-black/40 flex gap-3"
           >
             <textarea
               value={inputMessage}
-              onChange={e => setInputMessage(e.target.value)}
+              onChange={(e) => setInputMessage(e.target.value)}
               placeholder="Message EDITH AI..."
               rows={1}
-              className="flex-1 px-4 py-3 bg-[#111] border border-white/10
-              rounded-xl resize-none outline-none text-gray-100 placeholder-gray-500"
+              className="flex-1 px-4 py-3 bg-[#111] border border-white/10 rounded-xl"
             />
             <button
               type="submit"
               disabled={!inputMessage.trim()}
               className="h-[50px] w-[50px] flex items-center justify-center
-              rounded-xl bg-[#1a1a1a] border border-white/10
-              text-cyan-400 hover:bg-[#222] hover:text-cyan-300 transition"
+              rounded-xl bg-[#1a1a1a] text-cyan-400"
             >
-              <FaPaperPlane className="text-sm" />
+              <FaPaperPlane />
             </button>
           </form>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default EdithAi
+export default EdithAi;

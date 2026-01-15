@@ -1,53 +1,68 @@
-import React, { useEffect, useState } from "react"
-import axios from "axios"
-import toast from "react-hot-toast"
-import { FaUser, FaEnvelope, FaLock } from "react-icons/fa"
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 
 const Settings = () => {
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    password: ""
-  })
+    password: "",
+  });
+
+  const API_URL = import.meta.env.VITE_API_URL;
 
   /* FETCH CURRENT USER */
   useEffect(() => {
-    axios.get("http://localhost:3000/api/auth/me", {
-      withCredentials: true
-    }).then(res => {
-      setForm({
-        firstName: res.data.user.fullName.firstName,
-        lastName: res.data.user.fullName.lastName,
-        email: res.data.user.email,
-        password: ""
+    axios
+      .get(`${API_URL}/api/auth/me`, {
+        withCredentials: true,
       })
-    })
-  }, [])
+      .then((res) => {
+        setForm({
+          firstName: res.data.user.fullName.firstName,
+          lastName: res.data.user.fullName.lastName,
+          email: res.data.user.email,
+          password: "",
+        });
+      })
+      .catch(() => {
+        toast.error("Failed to load profile");
+      });
+  }, [API_URL]);
 
-  const handleChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleSubmit = async e => {
-    e.preventDefault()
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
       await axios.put(
-        "http://localhost:3000/api/auth/update-profile",
-        form,
+        `${API_URL}/api/auth/update-profile`,
+        {
+          firstName: form.firstName,
+          lastName: form.lastName,
+          email: form.email,
+          password: form.password || undefined, // empty password ignore
+        },
         { withCredentials: true }
-      )
-      toast.success("Profile updated successfully")
-      setForm(prev => ({ ...prev, password: "" }))
+      );
+
+      toast.success("Profile updated successfully ✅");
+      setForm((prev) => ({ ...prev, password: "" }));
     } catch {
-      toast.error("Failed to update profile")
+      toast.error("Failed to update profile");
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-blue-950
-      flex items-center justify-center px-4">
-
+    <div
+      className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-blue-950
+      flex items-center justify-center px-4"
+    >
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-lg bg-black/40 backdrop-blur-xl
@@ -55,7 +70,9 @@ const Settings = () => {
       >
         {/* Header */}
         <div className="text-center">
-          <h2 className="text-3xl font-extrabold tracking-tight text-white">Account Settings</h2>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white">
+            Account Settings
+          </h2>
           <p className="text-gray-400 text-sm mt-1">
             Update your personal information
           </p>
@@ -125,10 +142,8 @@ const Settings = () => {
           Save Changes
         </button>
       </form>
-
-     
     </div>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;
