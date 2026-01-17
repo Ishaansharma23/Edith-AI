@@ -272,7 +272,7 @@ const EdithAi = () => {
         <div className="flex items-center justify-between px-4 py-4
           border-b border-cyan-500/20 bg-black/40 backdrop-blur">
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 py-2.5">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 hover:bg-white/10 rounded-lg lg:hidden"
