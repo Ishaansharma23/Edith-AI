@@ -250,10 +250,6 @@ PINECONE_INDEX=edith-ai
 | Multi-user isolation  | Strict per-user memory      |
 
 
-📝 License
-
-MIT License
-
 👨‍💻 Author
 
 Ishaan Sharma
